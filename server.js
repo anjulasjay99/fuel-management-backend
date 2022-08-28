@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const fuelStationRouter = require("./routes/fuelStationRouter");
+const fuelOrderRouter = require("./routes/fuelOrderRouter");
 
 const app = express();
 dotenv.config();
@@ -23,6 +25,10 @@ mongoose.connect(URL, {
   useUnifiedTopology: true,
   //  useFindAndModify: false,
 });
+
+//routers
+app.use("/fuelStations", fuelStationRouter);
+app.use("/fuelOrders", fuelOrderRouter);
 
 const connection = mongoose.connection;
 connection.once("open", () => {
