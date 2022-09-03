@@ -2,8 +2,9 @@ const router = require("express").Router();
 const FuelOrder = require("../models/FuelOrder");
 
 //fetch all fuel orders
-router.route("/").get(async (req, res) => {
-  await FuelOrder.find()
+router.route("/:id").get(async (req, res) => {
+  const stationId = req.params.id;
+  await FuelOrder.find({ stationId })
     .then((data) => {
       res.status(200).json({ status: true, data });
     })
