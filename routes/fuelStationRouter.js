@@ -36,7 +36,33 @@ router.route("/register").post(async (req, res) => {
     ownerEmail,
   } = req.body;
 
+  let stationId = "";
+  let success = false;
+  //generating an unique station id
+  while (!success) {
+    //generate an id
+    stationId =
+      "FS" +
+      Math.floor(Math.random() * 1000)
+        .toString()
+        .padStart(3, "0");
+
+    //check if generated id already exists
+    await FuelStation.exists({ stationId })
+      .then((status) => {
+        if (status) {
+          success = false;
+        } else {
+          success = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   const newFuelStation = new FuelStation({
+    stationId,
     email,
     password,
     stationName,
@@ -65,6 +91,7 @@ router.route("/register").post(async (req, res) => {
 //update fuel station
 router.route("/").put(async (req, res) => {
   const {
+    stationId,
     email,
     password,
     stationName,
@@ -81,7 +108,7 @@ router.route("/").put(async (req, res) => {
   } = req.body;
 
   await FuelStation.findOneAndUpdate(
-    { email },
+    { stationId },
     {
       email,
       password,
