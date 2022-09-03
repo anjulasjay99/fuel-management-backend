@@ -5,6 +5,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const fuelStationRouter = require("./routes/fuelStationRouter");
 const fuelOrderRouter = require("./routes/fuelOrderRouter");
+const complaintRouter = require("./routes/complaintsRouter");
 
 const app = express();
 dotenv.config();
@@ -29,6 +30,7 @@ mongoose.connect(URL, {
 //routers
 app.use("/fuelStations", fuelStationRouter);
 app.use("/fuelOrders", fuelOrderRouter);
+app.use("/complaints",complaintRouter);
 
 const connection = mongoose.connection;
 connection.once("open", () => {
