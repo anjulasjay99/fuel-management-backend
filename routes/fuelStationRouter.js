@@ -89,11 +89,9 @@ router.route("/register").post(async (req, res) => {
 });
 
 //update fuel station
-router.route("/").put(async (req, res) => {
+router.route("/updateInfo").put(async (req, res) => {
   const {
     stationId,
-    email,
-    password,
     stationName,
     type,
     address,
@@ -110,8 +108,6 @@ router.route("/").put(async (req, res) => {
   await FuelStation.findOneAndUpdate(
     { stationId },
     {
-      email,
-      password,
       stationName,
       type,
       address,
@@ -133,16 +129,67 @@ router.route("/").put(async (req, res) => {
     });
 });
 
-//delete fuel station
-router.route("/").delete(async (req, res) => {
-  const { email } = req.body;
+//update fuel station
+router.route("/updateEmail").put(async (req, res) => {
+  const { stationId, email } = req.body;
 
-  await FuelStation.findOneAndRemove({ email })
+  await FuelStation.findOneAndUpdate(
+    { stationId },
+    {
+      email,
+    }
+  )
     .then((data) => {
       res.status(200).json({ status: true, msg: "Success" });
     })
     .catch((err) => {
       res.status(400).json({ status: false, error: err });
+    });
+});
+
+//update fuel station
+router.route("/updatePassword").put(async (req, res) => {
+  const { stationId, password } = req.body;
+
+  await FuelStation.findOneAndUpdate(
+    { stationId },
+    {
+      password,
+    }
+  )
+    .then((data) => {
+      res.status(200).json({ status: true, msg: "Success" });
+    })
+    .catch((err) => {
+      res.status(400).json({ status: false, error: err });
+    });
+});
+
+//delete fuel station
+router.route("/").delete(async (req, res) => {
+  const { stationId } = req.body;
+
+  await FuelStation.findOneAndRemove({ stationId })
+    .then((data) => {
+      res.status(200).json({ status: true, msg: "Success" });
+    })
+    .catch((err) => {
+      res.status(400).json({ status: false, error: err });
+    });
+});
+
+router.route("/login").post(async (req, res) => {
+  const { email, password } = req.body;
+  await FuelStation.findOne({ email })
+    .then((data) => {
+      if (data.password === password) {
+        res.status(200).json({ status: true, msg: "Success", userData: data });
+      } else {
+        res.status(400).json({ status: false, msg: "Incorrect Credentials" });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ status: false, msg: "Incorrect Credentials" });
     });
 });
 
