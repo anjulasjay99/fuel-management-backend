@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const UnregisteredStationSchema = new Schema({
-  statioId: { type: String, required: true },
-  stationNmae: { type: String, required: true },
+  stationId: { type: String, required: true },
+  stationName: { type: String, required: true },
   reason: { type: String, required: true },
 });
 

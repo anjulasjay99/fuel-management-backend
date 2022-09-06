@@ -193,4 +193,14 @@ router.route("/login").post(async (req, res) => {
     });
 });
 
+router.route("/").get(async (req, res) => {
+  await FuelStation.find()
+    .then((data) => {
+      res.status(200).json({ status: true, msg: "Fetched Successfully", data });
+    })
+    .catch((e) => {
+      res.status(400).json({ status: false, msg: "Error!" });
+    });
+});
+
 module.exports = router;
