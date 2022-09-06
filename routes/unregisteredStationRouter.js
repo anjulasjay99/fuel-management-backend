@@ -16,7 +16,7 @@ router.route("/").post(async (req, res) => {
       res.status(200).json({ status: true, msg: "Success" });
     })
     .catch((e) => {
-      res.status(400).json({ status: true, msg: "Error" });
+      res.status(400).json({ status: true, msg: "Error!" });
     });
 });
 
