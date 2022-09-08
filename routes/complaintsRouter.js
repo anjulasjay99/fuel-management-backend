@@ -2,15 +2,16 @@ const router = require("express").Router();
 const complaint = require("../models/complaints");
 
 //fetch all feedbacks
-router.route("/").get(async (req, res) => {
-  await complaint.find()
-    .then((data) => {
-      res.status(200).json({ status: true, data });
-    })
-    .catch((err) => {
-      res.status(400).json({ status: false, error: err });
-    });
-});
+router.route('/').get((req,res)=>{
+  complaint.find((err,data)=>{
+      if(err){
+          console.log(err)
+      }else{
+          res.json(data)
+      }
+  })
+})
+
 
 //add new complaint
 router.route("/").post(async (req, res) => {
@@ -33,6 +34,18 @@ router.route("/").post(async (req, res) => {
     });
 });
 
+//get specific complaint
+router.route("/get/:id").get(async(req,res) =>{
+  const id = req.params.id;
+  console.log(id);
+  await complaint.findById(id).then((complaint)=>{
+    res.json(complaint);
+    console.log(complaint)
+  }).catch((err) =>{
+    console.log(err);
+  })
+})
+
 //delete a complaint
 router.route("/delete/:id").delete((req, res) => {
     const id = req.params.id;
@@ -49,23 +62,23 @@ router.route("/delete/:id").delete((req, res) => {
   });
 
 //update a complaint
-router.route("/update/:id").put((req, res) => {
-    const id = req.params.id;
-    let data = new complaint(req.body);
+router.route("/update/:id").post(function (req, res) {
+  complaint.findById(req.params.id, function (err, complaint) {
+    if (!complaint) res.status(404).send("reservation is not found");
+    else 
+    complaint.email = req.body.email;
+    complaint.dateofComplaint = req.body.dateofComplaint;
+    complaint.reason = req.body.reason;
+    complaint.complaintDetails = req.body.complaintDetails;
     complaint
-      .findOneAndUpdate(id, {
-        email: data.email,
-        dateofComplaint: data.dateofComplaint,
-        reason: data.reason,
-        complaintDetails: data.complaintDetails,
-      })
-      .then(() => {
-        res.status(200).json("Updated Successfully!");
+      .save()
+      .then((complaint) => {
+        res.json("Complaint updated!");
       })
       .catch((err) => {
-        console.log(err);
-        res.status(400).json("Error!");
+        res.status(400).send("Update not possible");
       });
   });
+});
 
 module.exports = router;
