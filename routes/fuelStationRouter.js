@@ -36,7 +36,33 @@ router.route("/register").post(async (req, res) => {
     ownerEmail,
   } = req.body;
 
+  let stationId = "";
+  let success = false;
+  //generating an unique station id
+  while (!success) {
+    //generate an id
+    stationId =
+      "FS" +
+      Math.floor(Math.random() * 1000)
+        .toString()
+        .padStart(3, "0");
+
+    //check if generated id already exists
+    await FuelStation.exists({ stationId })
+      .then((status) => {
+        if (status) {
+          success = false;
+        } else {
+          success = true;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   const newFuelStation = new FuelStation({
+    stationId,
     email,
     password,
     stationName,
@@ -63,10 +89,9 @@ router.route("/register").post(async (req, res) => {
 });
 
 //update fuel station
-router.route("/").put(async (req, res) => {
+router.route("/updateInfo").put(async (req, res) => {
   const {
-    email,
-    password,
+    stationId,
     stationName,
     type,
     address,
@@ -81,10 +106,8 @@ router.route("/").put(async (req, res) => {
   } = req.body;
 
   await FuelStation.findOneAndUpdate(
-    { email },
+    { stationId },
     {
-      email,
-      password,
       stationName,
       type,
       address,
@@ -106,16 +129,77 @@ router.route("/").put(async (req, res) => {
     });
 });
 
-//delete fuel station
-router.route("/").delete(async (req, res) => {
-  const { email } = req.body;
+//update fuel station
+router.route("/updateEmail").put(async (req, res) => {
+  const { stationId, email } = req.body;
 
-  await FuelStation.findOneAndRemove({ email })
+  await FuelStation.findOneAndUpdate(
+    { stationId },
+    {
+      email,
+    }
+  )
     .then((data) => {
       res.status(200).json({ status: true, msg: "Success" });
     })
     .catch((err) => {
       res.status(400).json({ status: false, error: err });
+    });
+});
+
+//update fuel station
+router.route("/updatePassword").put(async (req, res) => {
+  const { stationId, password } = req.body;
+
+  await FuelStation.findOneAndUpdate(
+    { stationId },
+    {
+      password,
+    }
+  )
+    .then((data) => {
+      res.status(200).json({ status: true, msg: "Success" });
+    })
+    .catch((err) => {
+      res.status(400).json({ status: false, error: err });
+    });
+});
+
+//delete fuel station
+router.route("/").delete(async (req, res) => {
+  const { stationId } = req.body;
+
+  await FuelStation.findOneAndRemove({ stationId })
+    .then((data) => {
+      res.status(200).json({ status: true, msg: "Success" });
+    })
+    .catch((err) => {
+      res.status(400).json({ status: false, error: err });
+    });
+});
+
+router.route("/login").post(async (req, res) => {
+  const { email, password } = req.body;
+  await FuelStation.findOne({ email })
+    .then((data) => {
+      if (data.password === password) {
+        res.status(200).json({ status: true, msg: "Success", userData: data });
+      } else {
+        res.status(400).json({ status: false, msg: "Incorrect Credentials" });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ status: false, msg: "Incorrect Credentials" });
+    });
+});
+
+router.route("/").get(async (req, res) => {
+  await FuelStation.find()
+    .then((data) => {
+      res.status(200).json({ status: true, msg: "Fetched Successfully", data });
+    })
+    .catch((e) => {
+      res.status(400).json({ status: false, msg: "Error!" });
     });
 });
 
