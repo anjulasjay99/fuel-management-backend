@@ -15,11 +15,25 @@ router.route("/:id").get(async (req, res) => {
 
 //place new fuel order
 router.route("/").post(async (req, res) => {
-  const { email, type, amount, timeOfDelivery, payment } = req.body;
+  const { 
+    stationId,
+    email, 
+    type, 
+    amount, 
+    timeOfDelivery, 
+    payment, 
+    address, 
+    city, 
+    contactNo,
+    province, 
+    zipCode  
+  } = req.body;
+
   const refNo = "FO" + Date.now().toString();
   const status = "In Progress";
 
   const newOrder = new FuelOrder({
+    stationId,
     refNo,
     email,
     type,
@@ -27,6 +41,11 @@ router.route("/").post(async (req, res) => {
     timeOfDelivery,
     payment,
     status,
+    address, 
+    city, 
+    province, 
+    contactNo,
+    zipCode
   });
 
   newOrder
@@ -34,7 +53,7 @@ router.route("/").post(async (req, res) => {
     .then((data) => {
       res.status(200).json({ status: true, msg: "Success" });
     })
-    .then((err) => {
+    .catch((err) => {
       res.status(400).json({ status: false, error: err });
     });
 });
