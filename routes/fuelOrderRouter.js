@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const FuelOrder = require("../models/FuelOrder");
+const { calculatePayment } = require("../utils/payments");
 
 //fetch all fuel orders
 router.route("/:id").get(async (req, res) => {
@@ -15,18 +16,18 @@ router.route("/:id").get(async (req, res) => {
 
 //place new fuel order
 router.route("/").post(async (req, res) => {
-  const { 
+  const {
     stationId,
-    email, 
-    type, 
-    amount, 
-    timeOfDelivery, 
-    payment, 
-    address, 
-    city, 
+    email,
+    type,
+    amount,
+    timeOfDelivery,
+    payment,
+    address,
+    city,
     contactNo,
-    province, 
-    zipCode  
+    province,
+    zipCode,
   } = req.body;
 
   const refNo = "FO" + Date.now().toString();
@@ -41,11 +42,11 @@ router.route("/").post(async (req, res) => {
     timeOfDelivery,
     payment,
     status,
-    address, 
-    city, 
-    province, 
+    address,
+    city,
+    province,
     contactNo,
-    zipCode
+    zipCode,
   });
 
   newOrder
@@ -56,6 +57,22 @@ router.route("/").post(async (req, res) => {
     .catch((err) => {
       res.status(400).json({ status: false, error: err });
     });
+});
+
+//endpoint used for calculating order payemnt
+router.route("/calculatePayment").post(async (req, res) => {
+  const { type, amount } = req.body;
+
+  if (type === undefined || amount === undefined) {
+    res.status(400).json({ msg: "Missing values" });
+  } else {
+    const payment = calculatePayment(type, amount);
+    if (payment === -1) {
+      res.status(400).json({ msg: "Invalid fuel type" });
+    } else {
+      res.status(200).json({ msg: "Success", payment });
+    }
+  }
 });
 
 module.exports = router;
