@@ -39,6 +39,7 @@ router.route("/").post(async (req, res) => {
     email,
     type,
     amount,
+    orderDate: new Date().toISOString().split("T")[0],
     timeOfDelivery,
     payment,
     status,
