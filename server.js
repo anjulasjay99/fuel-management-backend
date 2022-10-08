@@ -8,6 +8,7 @@ const fuelOrderRouter = require("./routes/fuelOrderRouter");
 const complaintRouter = require("./routes/complaintsRouter");
 const unregisteredStationRouter = require("./routes/unregisteredStationRouter");
 const fuelAllocationRouter = require("./routes/fuelAllocationRouter");
+const fuelStationReport = require("./routes/fuelStationReport");
 
 const app = express();
 dotenv.config();
@@ -35,6 +36,7 @@ app.use("/fuelOrders", fuelOrderRouter);
 app.use("/complaints", complaintRouter);
 app.use("/unregisterStation", unregisteredStationRouter);
 app.use("/fuelAllocations", fuelAllocationRouter);
+app.use("/fuelStationReport", fuelStationReport);
 
 const connection = mongoose.connection;
 connection.once("open", () => {
