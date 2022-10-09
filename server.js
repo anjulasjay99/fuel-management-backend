@@ -5,6 +5,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const fuelStationRouter = require("./routes/fuelStationRouter");
 const fuelOrderRouter = require("./routes/fuelOrderRouter");
+const customerRouter = require("./routes/CustomerRoute");
 const complaintRouter = require("./routes/complaintsRouter");
 const unregisteredStationRouter = require("./routes/unregisteredStationRouter");
 const fuelAllocationRouter = require("./routes/fuelAllocationRouter");
@@ -33,10 +34,12 @@ mongoose.connect(URL, {
 //routers
 app.use("/fuelStations", fuelStationRouter);
 app.use("/fuelOrders", fuelOrderRouter);
+app.use("/customers" , customerRouter);
 app.use("/complaints", complaintRouter);
 app.use("/unregisterStation", unregisteredStationRouter);
 app.use("/fuelAllocations", fuelAllocationRouter);
 app.use("/fuelStationReport", fuelStationReport);
+
 
 const connection = mongoose.connection;
 connection.once("open", () => {
