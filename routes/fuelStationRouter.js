@@ -194,13 +194,60 @@ router.route("/login").post(async (req, res) => {
 });
 
 router.route("/").get(async (req, res) => {
-  await FuelStation.find()
-    .then((data) => {
-      res.status(200).json({ status: true, msg: "Fetched Successfully", data });
-    })
-    .catch((e) => {
-      res.status(400).json({ status: false, msg: "Error!" });
-    });
+  const filterArr = req.query.filter;
+  const val = req.query.val;
+
+  if (filterArr === undefined) {
+    await FuelStation.find()
+      .then((data) => {
+        res
+          .status(200)
+          .json({ status: true, msg: "Fetched Successfully", data });
+      })
+      .catch((e) => {
+        res.status(400).json({ status: false, msg: "Error!" });
+      });
+  } else {
+    if (Array.isArray(filterArr)) {
+      await FuelStation.aggregate([
+        {
+          $match: {
+            $or: filterArr.map((filter) => {
+              let obj = {};
+              obj[filter] = { $regex: val, $options: "i" };
+              return obj;
+            }),
+          },
+        },
+      ])
+        .then((data) => {
+          res
+            .status(200)
+            .json({ status: true, msg: "Fetched Successfully", data });
+        })
+        .catch((e) => {
+          res.status(400).json({ status: false, msg: "Error!" });
+        });
+    } else {
+      let obj = {};
+      obj[filterArr] = { $regex: val, $options: "i" };
+      await FuelStation.aggregate([
+        {
+          $match: {
+            $or: [obj],
+          },
+        },
+      ])
+        .then((data) => {
+          res
+            .status(200)
+            .json({ status: true, msg: "Fetched Successfully", data });
+        })
+        .catch((e) => {
+          res.status(400).json({ status: false, msg: "Error!" });
+        });
+    }
+  }
 });
 
 module.exports = router;
