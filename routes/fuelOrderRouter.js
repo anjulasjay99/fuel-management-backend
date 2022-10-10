@@ -5,13 +5,78 @@ const { calculatePayment } = require("../utils/payments");
 //fetch all fuel orders
 router.route("/:id").get(async (req, res) => {
   const stationId = req.params.id;
-  await FuelOrder.find({ stationId })
-    .then((data) => {
-      res.status(200).json({ status: true, data });
-    })
-    .catch((err) => {
-      res.status(400).json({ status: false, error: err });
-    });
+  const filterArr = req.query.filter;
+  const val = req.query.val;
+
+  if (filterArr === undefined) {
+    await FuelOrder.find({ stationId })
+      .then((data) => {
+        res
+          .status(200)
+          .json({ status: true, msg: "Fetched Successfully", data });
+      })
+      .catch((e) => {
+        res.status(400).json({ status: false, msg: "Error!" });
+      });
+  } else {
+    if (Array.isArray(filterArr)) {
+      await FuelOrder.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                stationId: { $regex: stationId, $options: "i" },
+              },
+            ],
+          },
+        },
+        {
+          $match: {
+            $or: filterArr.map((filter) => {
+              let obj = {};
+              obj[filter] = { $regex: val, $options: "i" };
+              return obj;
+            }),
+          },
+        },
+      ])
+        .then((data) => {
+          res
+            .status(200)
+            .json({ status: true, msg: "Fetched Successfully", data });
+        })
+        .catch((e) => {
+          res.status(400).json({ status: false, msg: "Error!" });
+        });
+    } else {
+      let obj = {};
+      obj[filterArr] = { $regex: val, $options: "i" };
+      await FuelOrder.aggregate([
+        {
+          $match: {
+            $or: [
+              {
+                stationId: { $regex: stationId, $options: "i" },
+              },
+            ],
+          },
+        },
+        {
+          $match: {
+            $or: [obj],
+          },
+        },
+      ])
+        .then((data) => {
+          res
+            .status(200)
+            .json({ status: true, msg: "Fetched Successfully", data });
+        })
+        .catch((e) => {
+          res.status(400).json({ status: false, msg: "Error!" });
+        });
+    }
+  }
 });
 
 //place new fuel order
