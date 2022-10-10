@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const complaint = require("../models/complaints");
 
+
+
 //fetch all feedbacks
 router.route('/').get((req,res)=>{
   complaint.find((err,data)=>{
@@ -46,6 +48,8 @@ router.route("/get/:id").get(async(req,res) =>{
   })
 })
 
+
+
 //delete a complaint
 router.route("/delete/:id").delete((req, res) => {
     const id = req.params.id;
@@ -60,6 +64,19 @@ router.route("/delete/:id").delete((req, res) => {
         res.status(400).json("Error!");
       });
   });
+//get complaint by email
+router.route("/get/user/:email").get(async(req,res) =>{
+  const email = req.params.email;
+  console.log(email);
+  await complaint.find({email}).then((complaint)=>{
+    res.json(complaint);
+    console.log(complaint)
+  }).catch((err) =>{
+    console.log(err);
+  })
+})
+
+
 
 //update a complaint
 router.route("/update/:id").post(function (req, res) {
