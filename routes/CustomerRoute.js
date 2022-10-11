@@ -1,5 +1,5 @@
 const router = require("express").Router();
-//const Customer = require("../models/Customer");
+const Customer = require("../models/Customer");
 const QRCode = require("qrcode");
 
 //Fetch all customers
