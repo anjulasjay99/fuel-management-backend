@@ -146,7 +146,7 @@ router.route("/getVehicles/:email").get((req,res) =>{
 
     Customer.findOne({email : email} , {vehicles : 1}).then((data) =>{
         console.log(data);
-        res.status(200).json({data});
+        res.status(200).json(data);
     }).catch((err) =>{
         console.log(err);
         res.status(400).json({msg:err});
@@ -155,7 +155,7 @@ router.route("/getVehicles/:email").get((req,res) =>{
 
 // Remove Vehicle 
 
-router.route("/getVehicles/:email").get((req,res) =>{
+router.route("/removeVehicle/:email").delete((req,res) =>{
     const email = req.params.email;
     const { id }  = req.body
     
