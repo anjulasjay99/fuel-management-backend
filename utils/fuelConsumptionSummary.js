@@ -1,4 +1,4 @@
-const FuelAllocation = require("../models/FuelAllocation");
+const FuelUsage = require("../models/FuelUsage");
 const FuelOrder = require("../models/FuelOrder");
 
 //get monthly data
@@ -12,7 +12,7 @@ const getMonthlyFuelConsumption = async (
   let customerData;
 
   //filtering allocation data
-  await FuelAllocation.aggregate([
+  await FuelUsage.aggregate([
     {
       $match: {
         stationId: { $regex: stationId, $options: "i" },
@@ -23,16 +23,16 @@ const getMonthlyFuelConsumption = async (
         _id: {
           month: {
             $month: {
-              $dateFromString: { dateString: "$startDate", format: "%Y-%m-%d" },
+              $dateFromString: { dateString: "$date", format: "%Y-%m-%d" },
             },
           },
           year: {
             $year: {
-              $dateFromString: { dateString: "$startDate", format: "%Y-%m-%d" },
+              $dateFromString: { dateString: "$date", format: "%Y-%m-%d" },
             },
           },
         },
-        totalAmount: { $sum: "$allocatedAmount" },
+        totalAmount: { $sum: "$pumpedAmount" },
         totalCustomers: { $count: {} },
       },
     },
@@ -50,12 +50,16 @@ const getMonthlyFuelConsumption = async (
   });
 
   let remainingFuelAmount =
-    orderSummary.totalAmount - customerData[0].totalAmount;
+    orderSummary.totalAmount -
+    (customerData.length > 0 ? customerData[0].totalAmount : 0);
 
   const consumeSummary = {
     types: fuelTypes,
+    totalPumpedAmount:
+      customerData.length > 0 ? customerData[0].totalAmount : 0,
     remainingFuelAmount,
-    totalCustomers: customerData[0].totalCustomers,
+    totalCustomers:
+      customerData.length > 0 ? customerData[0].totalCustomers : 0,
   };
 
   return consumeSummary;
@@ -67,7 +71,7 @@ const getAnnualFuelConsumption = async (stationId, year, orderSummary) => {
   let customerData;
 
   //filtering allocation data
-  await FuelAllocation.aggregate([
+  await FuelUsage.aggregate([
     {
       $match: {
         stationId: { $regex: stationId, $options: "i" },
@@ -78,11 +82,11 @@ const getAnnualFuelConsumption = async (stationId, year, orderSummary) => {
         _id: {
           year: {
             $year: {
-              $dateFromString: { dateString: "$startDate", format: "%Y-%m-%d" },
+              $dateFromString: { dateString: "$date", format: "%Y-%m-%d" },
             },
           },
         },
-        totalAmount: { $sum: "$allocatedAmount" },
+        totalAmount: { $sum: "$pumpedAmount" },
         totalCustomers: { $count: {} },
       },
     },
@@ -100,12 +104,17 @@ const getAnnualFuelConsumption = async (stationId, year, orderSummary) => {
   });
 
   let remainingFuelAmount =
-    orderSummary.totalAmount - customerData[0].totalAmount;
+    orderSummary.totalAmount - customerData.length > 0
+      ? customerData[0].totalAmount
+      : 0;
 
   const consumeSummary = {
     types: fuelTypes,
+    totalPumpedAmount:
+      customerData.length > 0 ? customerData[0].totalAmount : 0,
     remainingFuelAmount,
-    totalCustomers: customerData[0].totalCustomers,
+    totalCustomers:
+      customerData.length > 0 ? customerData[0].totalCustomers : 0,
   };
 
   return consumeSummary;

@@ -47,7 +47,6 @@ const getOrdersMonthlySummary = async (stationId, month, year) => {
       },
     },
   ]).then((data) => {
-    console.log(data);
     fuelOrderData = data;
   });
 
@@ -121,7 +120,6 @@ const getOrdersAnnualSummary = async (stationId, year) => {
       },
     },
   ]).then((data) => {
-    console.log(data);
     fuelOrderData = data;
   });
 
