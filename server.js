@@ -12,6 +12,7 @@ const fuelAllocationRouter = require("./routes/fuelAllocationRouter");
 const fuelStationReport = require("./routes/fuelStationReport");
 const fuelUsageRouter = require("./routes/fuelUsageRouter");
 const adminRouter = require("./routes/adminRouter");
+const fuelBookingRouter = require("./routes/fuelBookingsRouter");
 
 const app = express();
 dotenv.config();
@@ -45,6 +46,7 @@ app.use("/fuelAllocations", fuelAllocationRouter);
 app.use("/fuelStationReport", fuelStationReport);
 app.use("/fuelUsage", fuelUsageRouter);
 app.use("/admin", adminRouter);
+app.use("/fuelBookings", fuelBookingRouter);
 
 const connection = mongoose.connection;
 connection.once("open", () => {
