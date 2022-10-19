@@ -15,7 +15,8 @@ router.route("/:id").get(async (req, res) => {
           .status(200)
           .json({ status: true, msg: "Fetched Successfully", data });
       })
-      .catch((e) => {
+      .catch((err) => {
+        console.log(err);
         res.status(400).json({ status: false, msg: "Error!" });
       });
   } else {
@@ -45,7 +46,8 @@ router.route("/:id").get(async (req, res) => {
             .status(200)
             .json({ status: true, msg: "Fetched Successfully", data });
         })
-        .catch((e) => {
+        .catch((err) => {
+          console.log(err);
           res.status(400).json({ status: false, msg: "Error!" });
         });
     } else {
@@ -117,7 +119,7 @@ router.route("/").post(async (req, res) => {
 
   newOrder
     .save()
-    .then((data) => {
+    .then(() => {
       res.status(200).json({ status: true, msg: "Success" });
     })
     .catch((err) => {

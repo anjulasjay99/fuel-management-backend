@@ -13,16 +13,6 @@ router.route("/").post(async (req, res) => {
     endDate,
   } = req.body;
 
-  const newAlloc = new FuelAllocation({
-    customerId,
-    customerName,
-    vehicleNumber,
-    allocatedAmount,
-    availableAmount,
-    startDate,
-    endDate,
-  });
-
   await FuelAllocation.replaceOne(
     { customerId, vehicleNumber, startDate },
     {

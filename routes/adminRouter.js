@@ -12,7 +12,7 @@ router.route("/login").post(async (req, res) => {
         res.status(400).json({ status: false, msg: "Incorrect Credentials" });
       }
     })
-    .catch((err) => {
+    .catch(() => {
       res.status(400).json({ status: false, msg: "Incorrect Credentials" });
     });
 });
