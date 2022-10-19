@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Customer = require("../models/Customer");
+const FuelAllocation = require("../models/FuelAllocation");
 const QRCode = require("qrcode");
 
 //Fetch all customers
@@ -49,11 +50,13 @@ router.route("/checkEmail").post(async (req, res) => {
 router.route("/register").post(async (req, res) => {
   // Array to store vehicles.
   var vehiclesArr = [];
+
   var qr_code;
+  var vid = 1;
 
   req.body.vehicles.forEach(function (vehicle) {
     var vehicle = {
-      vehicleId: "1",
+      vehicleId: vid,
       vehicleType: vehicle.vehicleType,
       vehicleChassis: vehicle.vehicleChassis,
       vehicleNumber: vehicle.vehicleNumber,
@@ -131,7 +134,37 @@ router.route("/unregister/:email").delete(async (req, res) => {
 router.route("/addVehicle/:email").post(async (req, res) => {
   const email = req.params.email;
   const vehicle = req.body;
-  console.log(req.body);
+  var vid;
+  var max;
+ //   Generate ID for Vehicle
+  // while(!success){
+  //   await Customer.exists({ email : email , vehicleId : vid }).then((status) =>{
+  //     if(status){
+  //       success = false;
+  //       vid++;
+  //     }
+  //     else{
+  //       success = true;
+  //     }
+  //   })
+  // }
+
+  Customer.findOne({email : email} , {vehicles : 1}).then((data) =>{
+
+    // var idArr = [];
+    // data.forEach((vehicle) =>{
+    //   idArr.push(vehicle.vehicleId);
+    // })
+
+    // // Finding Maximum ID 
+    // max = Math.max(...vid);
+    // console.log(max);
+    console.log(data);
+    // data = JSON.parse(data);
+    // console.log(data);
+    max = Math.max(...data.map(o => o.vehicleId))
+    console.log(max);
+  })
   const newVh = {
     vehicleId: "1",
     vehicleType: vehicle.vehicleType,
@@ -152,36 +185,28 @@ router.route("/addVehicle/:email").post(async (req, res) => {
 router.route("/getVehicles/:email").get((req, res) => {
   const email = req.params.email;
 
-  Customer.findOne({ email: email }, { vehicles: 1 })
-    .then((data) => {
-      console.log(data);
-      res.status(200).json({ data });
+    Customer.findOne({email : email} , {vehicles : 1}).then((data) =>{
+        console.log(data);
+        res.status(200).json(data);
+    }).catch((err) =>{
+        console.log(err);
+        res.status(400).json({msg:err});
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json({ msg: err });
-    });
-});
+})
 
 // Remove Vehicle
 
-router.route("/getVehicles/:email").get((req, res) => {
-  const email = req.params.email;
-  const { id } = req.body;
-
-  Customer.updateOne(
-    { email: email },
-    { $pull: { vehicles: { vehicleId: id } } }
-  )
-    .then((data) => {
-      console.log(data);
-      res.status(200).json({ msg: "Deletion Succesfull" });
+router.route("/removeVehicle/:email").post((req,res) =>{
+    const email = req.params.email;
+    const { vehicleNumber }  = req.body
+    Customer.updateOne( {email : email} , { $pull : { vehicles : { vehicleNumber : vehicleNumber}}}).then((data) =>{
+        console.log(data);
+        res.status(200).json({msg:"Deletion Succesfull"});
+    }).catch((err) =>{
+        console.log(err);
+        res.status(400).json({msg : err});
     })
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json({ msg: err });
-    });
-});
+})
 
 // Report
 
@@ -196,12 +221,56 @@ router.route("/login").post(async (req, res) => {
           .status(200)
           .json({ msg: "Valid Credentials", status: true, userData: data });
       } else {
-        res.status(400).json({ msg: "Invalid Password", status: false });
+        res.status(200).json({ msg: "Invalid Password", status: false });
       }
     })
     .catch((err) => {
-      res.status(400).json({ msg: "Invalid Email", status: false });
+      res.status(200).json({ msg: "Invalid Email", status: false });
     });
 });
+
+// Password Confirmation Route
+
+router.route("/pass/:email").post(async(req,res) =>{
+  const email = req.params.email;
+  const { password } = req.body;
+  console.log(password);
+  await Customer.findOne( {email}).then((data) =>{
+
+    if(data.password === password){
+      res.json({status : true});
+    }
+    else{
+      res.json({status : false});
+    }
+  }).catch((err) =>{
+    res.json({msg:"Fetch pass error"});
+  })
+})
+
+// Get Available Fuel Amount
+
+router.route('/getFuel/:id').get(async(req,res) =>{
+  const id = req.params.id;
+  let dateTime = new Date();
+  let date = dateTime.toISOString().slice(0,10);
+ await FuelAllocation.aggregate(
+  [
+    {
+      $match : 
+        { "customerId" : id , "endDate" : { $lte : date } }
+    },
+    {
+      $group:
+      {
+        _id : { customerId : id   } , availableAmount : { $sum : "$availableAmount" }
+      }
+    }
+  ]
+ ).then((data)=>{
+  res.status(200).json(data);
+ })
+
+})
 
 module.exports = router;

@@ -63,4 +63,35 @@ router.route("/:id").get(async (req, res) => {
     });
 });
 
+
+// Report for fuel pumping
+
+router.route("/getPumpings/:cid").post(async (req,res) =>{
+  const cid = req.params.cid;
+  const { toDate , fromDate } = req.body;
+  await FuelUsage.aggregate([
+    {
+      $lookup:
+      {
+        from:"fuelstations",
+        localField:"stationId",
+        foreignField:"stationId",
+
+        as:"fuel_pumpings"
+      }
+    },
+    {
+      $match : {
+        "customerId" : cid , "date" : { $gt : fromDate , $lte : toDate }
+      }
+    }
+  ]).then((data) =>{
+    console.log(data);
+    res.status(200).json(data);
+  }).catch((err) =>{
+    console.log(err);
+    res.status(400).json({msg : "Error in Fetching Data"});
+  })
+})
+
 module.exports = router;

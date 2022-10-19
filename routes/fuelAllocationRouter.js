@@ -57,4 +57,18 @@ router.route("/:id").get((req, res) => {
     });
 });
 
+// Get Fuel Allocation by Customer 
+router.route("/byCus/:id").post((req,res) =>{
+  const id = req.params.id;
+  const { toDate , fromDate   } = req.body;
+  console.log( toDate , fromDate );
+
+  FuelAllocation.find({ customerId : id , startDate : { $gt : fromDate , $lte : toDate }  }).then((data) =>{
+    res.status(200).json(data);
+    console.log(data);
+  }).catch((err) =>{
+    res.status(400).json({msg : "error"});
+  })
+})
+
 module.exports = router;
