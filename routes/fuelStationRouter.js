@@ -80,7 +80,7 @@ router.route("/register").post(async (req, res) => {
 
   await newFuelStation
     .save()
-    .then((data) => {
+    .then(() => {
       res.json({ status: true, msg: "Success" });
     })
     .catch((err) => {
@@ -121,7 +121,7 @@ router.route("/updateInfo").put(async (req, res) => {
       ownerEmail,
     }
   )
-    .then((data) => {
+    .then(() => {
       res.status(200).json({ status: true, msg: "Success" });
     })
     .catch((err) => {
@@ -139,7 +139,7 @@ router.route("/updateEmail").put(async (req, res) => {
       email,
     }
   )
-    .then((data) => {
+    .then(() => {
       res.status(200).json({ status: true, msg: "Success" });
     })
     .catch((err) => {
@@ -157,7 +157,7 @@ router.route("/updatePassword").put(async (req, res) => {
       password,
     }
   )
-    .then((data) => {
+    .then(() => {
       res.status(200).json({ status: true, msg: "Success" });
     })
     .catch((err) => {
@@ -189,6 +189,7 @@ router.route("/login").post(async (req, res) => {
       }
     })
     .catch((err) => {
+      console.log(err);
       res.status(400).json({ status: false, msg: "Incorrect Credentials" });
     });
 });
@@ -225,7 +226,8 @@ router.route("/").get(async (req, res) => {
             .status(200)
             .json({ status: true, msg: "Fetched Successfully", data });
         })
-        .catch((e) => {
+        .catch((err) => {
+          console.log(err);
           res.status(400).json({ status: false, msg: "Error!" });
         });
     } else {
@@ -243,7 +245,8 @@ router.route("/").get(async (req, res) => {
             .status(200)
             .json({ status: true, msg: "Fetched Successfully", data });
         })
-        .catch((e) => {
+        .catch((err) => {
+          console.log(err);
           res.status(400).json({ status: false, msg: "Error!" });
         });
     }
