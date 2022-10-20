@@ -85,11 +85,11 @@ router.route("/delete/:id").delete((req, res) => {
   });
 
 //update a booking
-router.route("/update/:id").put((req, res) => {
+router.route("/update/:id").put(async (req, res) => {
     const id = req.params.id;
     let data = new fuelBooking(req.body);
-    fuelBooking
-      .findOneAndUpdate(id, {
+    
+    await fuelBooking.findByIdAndUpdate(id, {
         stationName: data.stationName,
         stationCity: data.stationCity,
         litres: data.litres,

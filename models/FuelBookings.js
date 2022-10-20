@@ -13,7 +13,6 @@ const fuelBookingSchema = new Schema({
     vehicleNo: { type: String, required: true },
     vehicleType: { type: String, required: true },
     email: { type: String, required: true },
-    // contactNo: { type: Number, required: true },
     status: { type: String, required: true },
 });
 
