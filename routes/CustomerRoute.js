@@ -254,6 +254,7 @@ router.route('/getFuel/:id').get(async(req,res) =>{
   const id = req.params.id;
   let dateTime = new Date();
   let date = dateTime.toISOString().slice(0,10);
+  console.log(id);
  await FuelAllocation.aggregate(
   [
     {
