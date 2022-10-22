@@ -252,7 +252,6 @@ router.route("/pass/:email").post(async(req,res) =>{
 
 router.route('/getFuel/:id').get(async(req,res) =>{
   const id = req.params.id;
-
  await FuelAllocation.aggregate(
   [
     {
