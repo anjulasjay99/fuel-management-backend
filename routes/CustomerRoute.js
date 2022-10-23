@@ -252,14 +252,11 @@ router.route("/pass/:email").post(async(req,res) =>{
 
 router.route('/getFuel/:id').get(async(req,res) =>{
   const id = req.params.id;
-  let dateTime = new Date();
-  let date = dateTime.toISOString().slice(0,10);
-  console.log(id);
  await FuelAllocation.aggregate(
   [
     {
       $match : 
-        { "customerId" : id , "endDate" : { $lte : date } }
+        { "customerId" : id  }
     },
     {
       $group:
@@ -272,6 +269,17 @@ router.route('/getFuel/:id').get(async(req,res) =>{
   res.status(200).json(data);
  })
 
+})
+
+// Get Available fuel per vehicle
+
+router.route("getFuel/:vehicleNo").get((req,res)=>{
+  const vehicleNo = req.params.vehicleNo;
+  FuelAllocation.findOne({ vehicleNumber : vehicleNo }).then((data)=>{
+    res.status(200).json(data);
+  }).catch((err)=>{
+    res.status(400).json(err);
+  })
 })
 
 module.exports = router;
