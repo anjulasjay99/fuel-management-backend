@@ -29,10 +29,10 @@ router.route("/").post(async (req, res) => {
   newComplaint
     .save()
     .then((data) => {
-      res.status(200).json({ status: true, msg: "Success" });
+      res.status(200).json();
     })
     .then((err) => {
-      res.status(400).json({ status: false, error: err });
+      res.status(400).json();
     });
 });
 
