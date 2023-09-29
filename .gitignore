@@ -1,3 +1,4 @@
 /node_modules
 /.scannerwork
 .history
+.DS_Store
